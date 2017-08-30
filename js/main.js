@@ -24,17 +24,16 @@ var cards = [
 
 function flipCard(){
 	var cardID = this.getAttribute("data-id");
-	console.log("User Flipped " + cards[cardID].rank);
-	console.log(cards[cardID].image);
-	console.log(cards[cardID].suit);
-	cardsInPlay.push(cards[cardID].rank);
-	this.setAttribute('src',cards[cardID].image);
-	if(cardsInPlay[0]===cardsInPlay[1]){
-		evaluateGuess(true);
-	}	
-	else{
-		if(cardsInPlay.length > 1){
-			evaluateGuess(false);
+	if(this.getAttribute("src")==="images/back.png"){
+		cardsInPlay.push(cards[cardID].rank);
+		this.setAttribute('src',cards[cardID].image);
+		if(cardsInPlay[0]===cardsInPlay[1]){
+			evaluateGuess(true);
+		}	
+		else{
+			if(cardsInPlay.length > 1){
+				evaluateGuess(false);
+			}
 		}
 	}
 }
@@ -58,10 +57,50 @@ function evaluateGuess(win) {
 	noButton.addEventListener('click', destroyBoard);
 	document.getElementById("play-controls").appendChild(noButton);
 
+	var scoreboard = document.getElementById("scoreboard");
+	if(scoreboard.childNodes.length === 0){
+		var wins  = document.createElement('p');
+		var losses  = document.createElement('p');
+		var winValue  = document.createElement('p');
+		var lossValue  = document.createElement('p');
+		wins.innerHTML = "Wins:";
+		losses.innerHTML = "Losses: ";
+		winValue.setAttribute('data-Count',0);
+		winValue.id = "winValue";
+		lossValue.setAttribute('data-Count',0);
+		lossValue.id = "lossValue";
+		winValue.innerHTML = '0';
+		lossValue.innerHTML = '0';
+		if(win){
+			incrementScore(winValue);
+		}
+		else{
+			incrementScore(lossValue);
+		}
+		scoreboard.appendChild(wins);
+		scoreboard.appendChild(losses);
+		scoreboard.appendChild(winValue);
+		scoreboard.appendChild(lossValue);
+	}
+	else{
+		if(win){
+			var winCount = document.getElementById("winValue");
+			incrementScore(winCount);
+		}
+		else{
+			var lossCount = document.getElementById("lossValue");
+			incrementScore(lossCount);
+		}
+	}
+}
+function incrementScore(element){
+	var currentScore = parseInt(element.getAttribute("data-Count"));
+	currentScore+=1;
+	element.innerHTML = currentScore;
+	element.setAttribute('data-Count',currentScore);
 }
 function createBoard(){
 	var gameBoard = document.getElementById("game-board");
-
 	for(i=0; i < cards.length;i++){
 		var newListItem = document.createElement('img');
 		newListItem.addEventListener('click', flipCard);
@@ -69,12 +108,6 @@ function createBoard(){
 		newListItem.setAttribute('data-id',i);
 		gameBoard.appendChild(newListItem);
 	}
-	var scoreBoard = document.createElement("table");
-	var scoreRow = scoreBoard.insertRow(0);
-	// add more rows
-	gameBoard.appendChild(scoreBoard);
-
-
 }
 function resetBoard() {
 	var gameBoard = document.getElementById("game-board").childNodes;
